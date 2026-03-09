@@ -3,7 +3,7 @@ from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()  # Like BaseModel in pydantic but slightly different
 
-class Product(Base):    # Create a structure for the sql to read as our Class has datatypes of python and no the sql
+class Product(Base):    # Create a structure for the sql to read as our Class has datatypes of python and not of sql
 
     __tablename__ = "Product"
 

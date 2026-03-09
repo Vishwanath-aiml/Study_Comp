@@ -41,11 +41,19 @@ def a():
 
 
 @app.get("/products")
-def p(db: Session = Depends(get_db)):  # Uses to "INJECT" the session of db as per rules of get_db"
-    return products
+def p(db: Session = Depends(get_db)):  # Used to "INJECT" the session of db as per rules of get_db"
+    
+    db_products = db.query(db_models.Product).all()
+    if db_products:
+        return db_products
+    return "No Products Found"
 
 @app.get("/products/{id}")
-def q(id):
-    for i in products:
-        if i.id == id:
-            return i
+def q(id, db: Session = Depends(get_db)):
+    
+    db_product = db.query(db_models.Product).filter(db_models.Product.id == id).all()
+
+    if db_product:
+        return db_product
+
+    return "Not found"
