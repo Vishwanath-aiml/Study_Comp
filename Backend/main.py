@@ -1,10 +1,21 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from sqlalchemy.orm import Session
 from models import Product
 from db import SessionLocal, engine
 import db_models
+from auth import scopes, flow
+from fastapi.responses import RedirectResponse
 
 app = FastAPI()
+
+@app.get("/login")
+def login():
+
+    authorization_url, state = flow.authorization_url(
+        access_type="offline",
+        prompt="consent"
+    )
+    return RedirectResponse(authorization_url)
 
 def get_db():
     '''This is created so that we dont need to manually create session everytime in a function 
