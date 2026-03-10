@@ -5,6 +5,8 @@ from db import SessionLocal, engine
 import db_models
 from auth import scopes, flow
 from fastapi.responses import RedirectResponse
+import os
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 app = FastAPI()
 
@@ -16,6 +18,16 @@ def login():
         prompt="consent"
     )
     return RedirectResponse(authorization_url)
+
+@app.get("/auth/callback")
+def auth_callback(request: Request):
+    flow.fetch_token(authorization_response = str(request.url))
+    credentials = flow.credentials
+    access_token = credentials.token
+    refresh_token = credentials.refresh_token
+    expiry = credentials.expiry
+    return {"message": "OAuth Successful"}
+
 
 def get_db():
     '''This is created so that we dont need to manually create session everytime in a function 

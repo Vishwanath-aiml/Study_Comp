@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()  # Like BaseModel in pydantic but slightly different
@@ -10,3 +10,13 @@ class Product(Base):    # Create a structure for the sql to read as our Class ha
     id = Column(Integer, primary_key = True) # Here no need of index = True as primary key does indexing
     name = Column(String)  # if u add index = True then there will be two indexes this one and primary key
     age = Column(Integer)
+
+class User(Base):
+
+    __tablename__ = "User"
+
+    id = Column(Integer, primary_key = True)
+    user_email = Column(String, unique = True, index = True)  # unique is for not allowing duplicate emails
+    access_token = Column(String)
+    refresh_token = Column(String)
+    expiry = Column(DateTime)
