@@ -5,8 +5,8 @@ from db import SessionLocal, engine
 import db_models
 from auth import scopes, flow
 from fastapi.responses import RedirectResponse
-import os
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+import os   # Temporarily run the auth without https requirement
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # local machine provides http while google auth demands httpS
 
 app = FastAPI()
 
