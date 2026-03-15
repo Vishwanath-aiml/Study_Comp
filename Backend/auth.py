@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
 from datetime import datetime
 from db import get_db
+from sqlalchemy.orm import Session
 import db_models
 
 scopes = [
@@ -27,12 +28,13 @@ def login():
 
     authorization_url, state = flow.authorization_url(
         access_type="offline",
-        prompt="consent"
+        prompt="select_account"
     )
     return RedirectResponse(authorization_url)
 
 @auth_router.get("/auth/callback")
 def auth_callback(request: Request, db:Session = Depends(get_db)):
+    # Creates a New login session
     flow.fetch_token(authorization_response = str(request.url))
     credentials = flow.credentials
     access_token = credentials.token
@@ -44,5 +46,22 @@ def auth_callback(request: Request, db:Session = Depends(get_db)):
     )
     user_info = response.json()
     user_email = user_info["email"]
+    
+    exists = db.query(db_models.User).filter( db_models.User.user_email == user_email).first()
+
+    if exists:
+        exists.access_token = access_token
+        exists.refresh_token = refresh_token
+        exists.expiry = expiry
+
+    else:
+        db.add(db_models.User(
+            user_email = user_email,
+            access_token = access_token,
+            refresh_token = refresh_token,
+            expiry = expiry
+        ))
+
+
     return {"message": "OAuth Successful"}
 
