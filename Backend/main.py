@@ -1,59 +1,23 @@
 from fastapi import FastAPI, Depends, Request
 from sqlalchemy.orm import Session
 from models import Product
-from db import SessionLocal, engine
+from db import SessionLocal, engine, get_db, init_db, products
 import db_models
-from auth import scopes, flow
-from fastapi.responses import RedirectResponse
+from auth import auth_router # For the inclusion of its router to validate its urls
+
 import os   # Temporarily run the auth without https requirement
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # local machine provides http while google auth demands httpS
 
 app = FastAPI()
-
-@app.get("/login")
-def login():
-
-    authorization_url, state = flow.authorization_url(
-        access_type="offline",
-        prompt="consent"
-    )
-    return RedirectResponse(authorization_url)
-
-@app.get("/auth/callback")
-def auth_callback(request: Request):
-    flow.fetch_token(authorization_response = str(request.url))
-    credentials = flow.credentials
-    access_token = credentials.token
-    refresh_token = credentials.refresh_token
-    expiry = credentials.expiry
-    return {"message": "OAuth Successful"}
+app.include_router(auth_router)
 
 
-def get_db():
-    '''This is created so that we dont need to manually create session everytime in a function 
-       and also to make sure that the session is closed after the function is executed'''
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 db_models.Base.metadata.create_all(bind=engine)  # To create those tables
 
-products = [
-    Product(id = 1, name="Sam", age = 19),
-    Product(id = 2, name="Ram", age = 18)
-]
 
-def init_db():
-    db = SessionLocal()  # Create a session
 
-    count = db.query(db_models.Product).count()  # so that it doesnt add when table is already having these things( basic version needs to change)
-    if count == 0:
-        for i in products:                               # in next line to specidy which table u need to write db_mdels.(Class name of the table)
-            db.add(db_models.Product(**i.model_dump()))  # ** is for unpacking and model_dump is to convert it to dictionary format to be able to unpack
-    
-    db.commit() # Because auto commit was disabled
+
 
 init_db() # without this the function wont execute what happened to u
 
