@@ -28,7 +28,7 @@ def login():
 
     authorization_url, state = flow.authorization_url(
         access_type="offline",
-        prompt="select_account"
+        prompt="consent"
     )
     return RedirectResponse(authorization_url)
 
@@ -39,7 +39,7 @@ def auth_callback(request: Request, db:Session = Depends(get_db)):
     credentials = flow.credentials
     access_token = credentials.token
     refresh_token = credentials.refresh_token
-    expiry = credentials.expiry    
+    expiry = credentials.expiry     
     response = requests.get(
         "https://www.googleapis.com/oauth2/v2/userinfo",
         headers={"Authorization": f"Bearer {credentials.token}"}
@@ -61,7 +61,7 @@ def auth_callback(request: Request, db:Session = Depends(get_db)):
             refresh_token = refresh_token,
             expiry = expiry
         ))
-
+    db.commit()
 
     return {"message": "OAuth Successful"}
 
