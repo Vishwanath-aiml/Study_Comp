@@ -12,7 +12,8 @@ scopes = [
  "https://www.googleapis.com/auth/classroom.courses.readonly",
  "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
  "https://www.googleapis.com/auth/userinfo.email",
- "openid" 
+ "openid",
+ "https://www.googleapis.com/auth/drive.readonly"
 ]
 
 flow = Flow.from_client_secrets_file(

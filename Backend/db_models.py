@@ -20,3 +20,14 @@ class User(Base):
     access_token = Column(String)
     refresh_token = Column(String)
     expiry = Column(DateTime)
+
+class PYQFile(Base):
+    __tablename__ = "PYQFile"
+
+    id = Column(Integer, primary_key=True)
+    file_id = Column(String)
+    name = Column(String)
+    mime_type = Column(String)
+    user_id = Column(Integer)
+    extracted_text = Column(String)
+    year = Column(Integer, nullable=True)

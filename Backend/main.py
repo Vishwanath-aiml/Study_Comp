@@ -4,13 +4,15 @@ from models import Product
 from db import SessionLocal, engine, get_db, init_db, products
 import db_models
 from auth import auth_router # For the inclusion of its router to validate its urls
+from users import user_router
+
 
 import os   # Temporarily run the auth without https requirement
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # local machine provides http while google auth demands httpS
 
 app = FastAPI()
 app.include_router(auth_router)
-
+app.include_router(user_router)
 
 
 db_models.Base.metadata.create_all(bind=engine)  # To create those tables
